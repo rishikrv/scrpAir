@@ -9,16 +9,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// API Route: /scrape?url=https://...
+// API Route: /scrape?id=1127996799714209094
 app.get("/scrape", async (req, res) => {
-  const url = req.query.url;
+  const listingId = req.query.id;
 
-  if (!url) {
-    return res.status(400).json({ error: "Missing 'url' query parameter" });
+  if (!listingId) {
+    return res.status(400).json({ error: "Missing 'id' query parameter" });
   }
 
   try {
-    const blockedDates = await scrapeBlockedDates(url);
+    const blockedDates = await scrapeBlockedDates(listingId);
     res.json({ blockedDates });
   } catch (error) {
     console.error("Scrape error:", error);

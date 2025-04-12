@@ -4,10 +4,11 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 puppeteer.use(StealthPlugin());
 
-export async function scrapeBlockedDates(url) {
+export async function scrapeBlockedDates(listingId) {
+  const calendarUrl = `https://www.airbnb.com/rooms/${listingId}`;
+
   const browser = await puppeteer.launch({
     headless: true,
-    defaultViewport: null,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
@@ -20,7 +21,7 @@ export async function scrapeBlockedDates(url) {
     "Accept-Language": "en-US,en;q=0.9",
   });
 
-  await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
+  await page.goto(calendarUrl, { waitUntil: "networkidle2", timeout: 0 });
 
   await page.evaluate(() => {
     window.scrollBy(0, 1000);
