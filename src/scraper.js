@@ -7,7 +7,9 @@ export async function scrapeBlockedDates(listingId) {
   const url = `https://www.airbnb.com/rooms/${listingId}`;
 
   const browser = await puppeteer.launch({
-    headless: "new", // required for latest puppeteer in server environments
+    headless: true,
+    executablePath:
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
