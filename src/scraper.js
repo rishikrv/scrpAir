@@ -1,15 +1,23 @@
-// scraper.js
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 puppeteer.use(StealthPlugin());
 
 export async function scrapeBlockedDates(listingId) {
-  const calendarUrl = `https://www.airbnb.com/rooms/${listingId}`;
+  const url = `https://www.airbnb.com/rooms/${listingId}`;
 
   const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: "new", // required for latest puppeteer in server environments
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu",
+    ],
   });
 
   const page = await browser.newPage();
@@ -21,12 +29,9 @@ export async function scrapeBlockedDates(listingId) {
     "Accept-Language": "en-US,en;q=0.9",
   });
 
-  await page.goto(calendarUrl, { waitUntil: "networkidle2", timeout: 0 });
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
 
-  await page.evaluate(() => {
-    window.scrollBy(0, 1000);
-  });
-
+  await page.evaluate(() => window.scrollBy(0, 1000));
   await page.waitForSelector('[data-testid^="calendar-day-"]', {
     timeout: 30000,
   });
