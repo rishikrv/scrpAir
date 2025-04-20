@@ -8,12 +8,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Root confirmation route
 app.get("/", (req, res) => {
   res.send(`✅ Scraper server is running on PORT ${PORT}`);
 });
 
-// API Route: /scrape?id=LISTING_ID
 app.get("/scrape", async (req, res) => {
   const listingId = req.query.id;
 
