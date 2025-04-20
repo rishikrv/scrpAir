@@ -1,37 +1,42 @@
-import puppeteer from "puppeteer";
+const puppeteer = require("puppeteer");
 
-export async function scrapeBlockedDates(listingId) {
+async function scrapeBlockedDates(url) {
+  const browser = await puppeteer.launch({
+    headless: true, // Set to false if you want to see the browser
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
+  const page = await browser.newPage();
+
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    // Go to the provided Airbnb URL
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+
+    // Wait for the calendar to load by targeting a known element
+    await page.waitForSelector(".calendar");
+
+    // Wait for a few seconds for the page to load completely
+    await page.waitForTimeout(5000); // waits for 5 seconds
+
+    // Example: Scrape blocked dates
+    const blockedDates = await page.evaluate(() => {
+      const dates = [];
+      const elements = document.querySelectorAll(".blocked-date"); // Modify this according to the page structure
+
+      elements.forEach((element) => {
+        dates.push(element.getAttribute("data-date")); // Modify this depending on the data you need
+      });
+
+      return dates;
     });
 
-    const page = await browser.newPage();
-    await page.goto(`https://www.airbnb.com/rooms/${listingId}`, {
-      waitUntil: "networkidle2",
-      timeout: 60000,
-    });
-
-    await page.waitForTimeout(5000);
-
-    const dates = await page.$$eval(
-      '[data-testid^="calendar-day-"]',
-      (elements) =>
-        elements.map((el) => {
-          const dateString = el.getAttribute("data-testid");
-          const dateMatch = dateString?.match(/\d{2}\/\d{2}\/\d{4}/);
-          return {
-            date: dateMatch ? dateMatch[0] : null,
-            isBlocked: el.getAttribute("data-is-day-blocked"),
-          };
-        })
-    );
-
+    return blockedDates;
+  } catch (error) {
+    console.error("Error during scraping:", error);
+    throw new Error("Failed to scrape the Airbnb page");
+  } finally {
     await browser.close();
-    return dates;
-  } catch (err) {
-    console.error("❌ Scrape failed:", err);
-    throw err;
   }
 }
+
+module.exports = scrapeBlockedDates;

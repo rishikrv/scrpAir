@@ -1,33 +1,28 @@
-import express from "express";
-import cors from "cors";
-import { scrapeBlockedDates } from "./scraper.js";
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const scrapeBlockedDates = require("./scraper");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 3000;
 
+// Middleware
+app.use(bodyParser.json());
 app.use(cors());
-app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send(`✅ Scraper server is running on PORT ${PORT}`);
-});
-
-app.get("/scrape", async (req, res) => {
-  const listingId = req.query.id;
-
-  if (!listingId) {
-    return res.status(400).json({ error: "Missing 'id' query parameter" });
-  }
+// Define the route for scraping blocked dates
+app.post("/scrape", async (req, res) => {
+  const { url } = req.body;
 
   try {
-    const blockedDates = await scrapeBlockedDates(listingId);
-    res.json({ blockedDates });
+    const blockedDates = await scrapeBlockedDates(url);
+    res.json({ success: true, blockedDates });
   } catch (error) {
-    console.error("Scrape error:", error);
-    res.status(500).json({ error: "Failed to scrape the Airbnb page" });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
