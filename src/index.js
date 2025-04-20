@@ -1,7 +1,7 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const scrapeBlockedDates = require("./scraper");
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import scrapeBlockedDates from "./scraper.js";
 
 const app = express();
 const port = 3000;

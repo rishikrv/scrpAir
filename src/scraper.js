@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+import puppeteer from "puppeteer";
 
 async function scrapeBlockedDates(url) {
   const browser = await puppeteer.launch({
@@ -39,4 +39,4 @@ async function scrapeBlockedDates(url) {
   }
 }
 
-module.exports = scrapeBlockedDates;
+export default scrapeBlockedDates;
