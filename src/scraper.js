@@ -1,11 +1,10 @@
-import puppeteer from "puppeteer-core"; // or 'puppeteer' if you're using that
+import puppeteer from "puppeteer";
 
 export async function scrapeBlockedDates(listingId) {
   try {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: "/usr/bin/chromium-browser", // Adjust based on where Chromium is installed
     });
 
     const page = await browser.newPage();
@@ -14,7 +13,7 @@ export async function scrapeBlockedDates(listingId) {
       timeout: 60000,
     });
 
-    await page.waitForTimeout(5000); // Wait for calendar to load
+    await page.waitForTimeout(5000);
 
     const dates = await page.$$eval(
       '[data-testid^="calendar-day-"]',
